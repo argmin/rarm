@@ -1,5 +1,5 @@
 # Project: Pick and Place
-#### Report and execution
+#### Report
 ---
 
 ### Summary
@@ -28,7 +28,7 @@ dh = {alpha0: 0, a0: a01, d1: 0.75,
 ```
 
 Here's the image that would give an idea of frame of reference atached to the joints
-![Frame of Reference]()
+![Frame of Reference](https://github.com/argmin/rarm/blob/03f11b0a9f68f49f9f425c982794fabf343af98c/for.jpg)
 
 
 The next step is to build a homogeneous trantion matrix from the base to the end effector, each of which would describe the position and orientation of the joint wrt to origin in terms of DH parameters as shown in the example.
@@ -123,5 +123,8 @@ theta6 = atan2(-R3_6[1,1], R3_6[1,0])
 * I do see imaginary numbers sometimes, the cause eludes me, for now I have a check to prevent it from happening.
 * Inverse kinematics althogh very interesting is not particularly scalable way, perhaps a better way could be learning to follow a trajectory ex: imitation learning.
 
+
+### Credits
+Thanks to everyone in the Udacity Robotics ND Slack community, who helped me understand the concepts and clear the confusion.
 
 
