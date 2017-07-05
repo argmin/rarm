@@ -50,7 +50,7 @@ dh = {alpha0: 0, a0: a01, d1: 0.75,
 ```
 
 Here's the image that would give an idea of frame of reference atached to the joints
-![Frame of Reference](https://github.com/argmin/rarm/blob/03f11b0a9f68f49f9f425c982794fabf343af98c/for.jpg)
+![Frame of Reference](https://github.com/argmin/rarm/blob/master/for.jpg)
 
 
 The next step is to build a homogeneous trantion matrix from the base to the end effector, each of which would describe the position and orientation of the joint wrt to origin in terms of DH parameters as shown in the example.
@@ -134,6 +134,9 @@ theta2 = atan2(sqrt(1. - D*D), D) + atan2((Wc[2]-JZ0_2), sqrt((Wc[0]-JX0_2)**2 +
 theta2 = np.pi / 2. - theta2
 
 ```
+
+![Theta 2 Derivation](https://github.com/argmin/rarm/blob/master/theta2.jpg)
+
 #### Theta 3
 We first need to find the angle between line from joint 3-5 and line from extending from joint 2 - 3, and make adjustment for the offset for joint 4 in Z direction and the knee bend.
 
@@ -143,6 +146,8 @@ D = 1. if (D > 1 or D < -1) else D # Precaution agains imaginary numbers
 theta3 = atan2(0.054, 1.5) - np.pi/2. + acos(D)
 
 ``` 
+
+![Theta 3 Derivation](https://github.com/argmin/rarm/blob/master/theta3.jpg)
 
 #### Theta 4-6
 To compute theta4-6 we need to first find the orientation matrix from `R3_6`, when theta1-3 are applied to the transition matrix `T0_3`
