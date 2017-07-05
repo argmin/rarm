@@ -14,9 +14,31 @@ In this section we describe forward kinematics of of the arm, the idea here is t
 
 Lets begin by handing labels to the joints and links, joints `1 to 6 + end effector`, and links `1 to 6 + base & gripper link`. We fix the frame fo references at each joints, in addtion to a joint `O_0` from which the base link orininates. The next step is to assign DH parameters, the values of which were extracted from the lessons and the urdf file.
 
-#### DH parameter
+#### DH parameters
+
+##### DH Table
+
+| i | alpha(i-1) | a(i-1) | d(i) | q(i) |
+|---|------------|--------|------|------|
+| 1 | 0          | 0      | 0.75 | q1   |
+| 2 | -pi/2      | 0.35   | 0    | q2 - pi/2 |
+| 3 | 0          | 1.25   | 0    | q3   |
+| 4 | -pi/2      | 0-.054 | 1.5  | q4   |
+| 5 | pi/2       | 0      | 0    | q5   |
+| 6 | -pi/2      | 0      | 0    | q6   |
+| 7 | 0          | 0      | 0.303| 0    |
+
+
 
 ```python
+a01 = 0
+a12 = 0.35
+a23 = 1.25
+a34 = -0.054
+a45 = 0
+a56 = 0
+a67 = 0
+
 dh = {alpha0: 0, a0: a01, d1: 0.75,
      alpha1: -pi/2, a1: a12, d2: 0, q2: q2 - pi/2,
      alpha2: 0, a2: a23, d3: 0,
