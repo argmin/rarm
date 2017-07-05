@@ -59,6 +59,37 @@ T0_2 =
 
 This logic is extended to find the transition matrix from base link's origin to the end effector (`T0_7`). Now given the `theta's` we can compute the orientation and position of the end effector.
 
+
+Note: In order to speed up the computation the DH params where substituted when available while computing `T0_EE`
+
+```python
+T0_EE = 
+⎡((sin(q₁)⋅sin(q₄) + sin(q₂ + q₃)⋅cos(q₁)⋅cos(q₄))⋅cos(q₅) + sin(q₅)⋅cos(q₁)⋅cos(q₂ + q₃))⋅cos(q₆) - (-sin(q₁)⋅cos(q₄) + sin(q₄)⋅sin(q₂ + q₃)⋅cos(q₁))⋅sin(q₆)  -((sin(q₁)⋅sin(q₄) + sin(q₂ + q₃)⋅cos(q₁)⋅cos(q₄))⋅cos(q₅) + sin(q₅)⋅cos(q₁)⋅cos(q₂ + q₃))⋅sin(q₆) + (sin(q₁)⋅
+⎢
+⎢((sin(q₁)⋅sin(q₂ + q₃)⋅cos(q₄) - sin(q₄)⋅cos(q₁))⋅cos(q₅) + sin(q₁)⋅sin(q₅)⋅cos(q₂ + q₃))⋅cos(q₆) - (sin(q₁)⋅sin(q₄)⋅sin(q₂ + q₃) + cos(q₁)⋅cos(q₄))⋅sin(q₆)   -((sin(q₁)⋅sin(q₂ + q₃)⋅cos(q₄) - sin(q₄)⋅cos(q₁))⋅cos(q₅) + sin(q₁)⋅sin(q₅)⋅cos(q₂ + q₃))⋅sin(q₆) - (sin(q₁)⋅
+⎢
+⎢                                -(sin(q₅)⋅sin(q₂ + q₃) - cos(q₄)⋅cos(q₅)⋅cos(q₂ + q₃))⋅cos(q₆) - sin(q₄)⋅sin(q₆)⋅cos(q₂ + q₃)                                                                  (sin(q₅)⋅sin(q₂ + q₃) - cos(q₄)⋅cos(q₅)⋅cos(q₂ + q₃))⋅sin(q₆) - sin(q₄)⋅cos(q₆
+⎢
+⎣                                                                              0                                                                                                                                                              0
+
+cos(q₄) - sin(q₄)⋅sin(q₂ + q₃)⋅cos(q₁))⋅cos(q₆)  -(sin(q₁)⋅sin(q₄) + sin(q₂ + q₃)⋅cos(q₁)⋅cos(q₄))⋅sin(q₅) + cos(q₁)⋅cos(q₅)⋅cos(q₂ + q₃)  -0.303⋅sin(q₁)⋅sin(q₄)⋅sin(q₅) + 1.25⋅sin(q₂)⋅cos(q₁) - 0.303⋅sin(q₅)⋅sin(q₂ + q₃)⋅cos(q₁)⋅cos(q₄) - 0.054⋅sin(q₂ + q₃)⋅cos(q₁) + 0
+
+sin(q₄)⋅sin(q₂ + q₃) + cos(q₁)⋅cos(q₄))⋅cos(q₆)  -(sin(q₁)⋅sin(q₂ + q₃)⋅cos(q₄) - sin(q₄)⋅cos(q₁))⋅sin(q₅) + sin(q₁)⋅cos(q₅)⋅cos(q₂ + q₃)  1.25⋅sin(q₁)⋅sin(q₂) - 0.303⋅sin(q₁)⋅sin(q₅)⋅sin(q₂ + q₃)⋅cos(q₄) - 0.054⋅sin(q₁)⋅sin(q₂ + q₃) + 0.303⋅sin(q₁)⋅cos(q₅)⋅cos(q₂ + q₃)
+
+)⋅cos(q₂ + q₃)                                                     -sin(q₅)⋅cos(q₄)⋅cos(q₂ + q₃) - sin(q₂ + q₃)⋅cos(q₅)                                                            -0.303⋅sin(q₅)⋅cos(q₄)⋅cos(q₂ + q₃) - 0.303⋅sin(q₂ + q₃)⋅cos(q₅) - 1.5⋅sin(q₂ + q₃) + 1.25⋅
+
+                                                                                            0                                                                                                                                                    1
+
+.303⋅cos(q₁)⋅cos(q₅)⋅cos(q₂ + q₃) + 1.5⋅cos(q₁)⋅cos(q₂ + q₃) + 0.35⋅cos(q₁)⎤
+                                                                           ⎥
+ + 1.5⋅sin(q₁)⋅cos(q₂ + q₃) + 0.35⋅sin(q₁) + 0.303⋅sin(q₄)⋅sin(q₅)⋅cos(q₁) ⎥
+                                                                           ⎥
+cos(q₂) - 0.054⋅cos(q₂ + q₃) + 0.75                                        ⎥
+                                                                           ⎥
+                                                                           ⎦
+
+```
+
 ### Inverse kinematics
 
 In this section we how to compute the values of `theta` given the expected position of the end effector, in other words we are revese engineering the forward kinemtics transition matrices to get the control values, which in our case are `theta 1 to 6`. In this project MoveIt describes the path / trajectory of the point and we need to compute the thetas such then end effector follows that trajectory.
