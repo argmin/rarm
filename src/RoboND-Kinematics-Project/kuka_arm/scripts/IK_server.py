@@ -152,14 +152,14 @@ def handle_calculate_IK(req):
             # 180 - Angle between links connecting Joint2-3 and joint3-5
             # Add the offset and add correction for the knee bend
             D = (L2_5**2 - L2_3**2 - L3_5**2) / (2 * L2_3 * L3_5)
-            D = 1. if (D > 1 or D < -1) else D # Precaution agains imaginary numbers
+            D = 1. if D > 1 else -1. if D < -1 else D # Precaution agains imaginary numbers
             theta3 = atan2(0.054, 1.5) - np.pi/2. + acos(D)
 
             # Angle between links connecting Joint2-3 and joint2-5
             # Add the offset, i.e. angle between XY plant of joint 2 and Wrist center 
             # and add correction for the knee bend
             D = (-L3_5**2 + L2_3**2 + L2_5**2) / (2 * L2_3 * L2_5)
-            D = 1. if (D > 1 or D < -1) else D
+            D = 1. if D > 1 else -1. if D < -1 else D
             theta2 = atan2(sqrt(1. - D**2), D) + atan2((Wc[2]-JZ0_2), sqrt((Wc[0]-JX0_2)**2 + (Wc[1])**2))
             theta2 = np.pi / 2. - theta2
 
