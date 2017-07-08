@@ -14,9 +14,31 @@ In this section we describe forward kinematics of of the arm, the idea here is t
 
 Lets begin by handing labels to the joints and links, joints `1 to 6 + end effector`, and links `1 to 6 + base & gripper link`. We fix the frame fo references at each joints, in addtion to a joint `O_0` from which the base link orininates. The next step is to assign DH parameters, the values of which were extracted from the lessons and the urdf file.
 
-#### DH parameter
+#### DH parameters
+
+##### DH Table
+
+| i | alpha(i-1) | a(i-1) | d(i) | q(i) |
+|---|------------|--------|------|------|
+| 1 | 0          | 0      | 0.75 | q1   |
+| 2 | -pi/2      | 0.35   | 0    | q2 - pi/2 |
+| 3 | 0          | 1.25   | 0    | q3   |
+| 4 | -pi/2      | -0.054 | 1.5  | q4   |
+| 5 | pi/2       | 0      | 0    | q5   |
+| 6 | -pi/2      | 0      | 0    | q6   |
+| 7 | 0          | 0      | 0.303| 0    |
+
+
 
 ```python
+a01 = 0
+a12 = 0.35
+a23 = 1.25
+a34 = -0.054
+a45 = 0
+a56 = 0
+a67 = 0
+
 dh = {alpha0: 0, a0: a01, d1: 0.75,
      alpha1: -pi/2, a1: a12, d2: 0, q2: q2 - pi/2,
      alpha2: 0, a2: a23, d3: 0,
@@ -28,7 +50,7 @@ dh = {alpha0: 0, a0: a01, d1: 0.75,
 ```
 
 Here's the image that would give an idea of frame of reference atached to the joints
-![Frame of Reference](https://github.com/argmin/rarm/blob/03f11b0a9f68f49f9f425c982794fabf343af98c/for.jpg)
+![Frame of Reference](https://github.com/argmin/rarm/blob/master/for.jpg)
 
 
 The next step is to build a homogeneous trantion matrix from the base to the end effector, each of which would describe the position and orientation of the joint wrt to origin in terms of DH parameters as shown in the example.
@@ -59,6 +81,37 @@ T0_2 =
 
 This logic is extended to find the transition matrix from base link's origin to the end effector (`T0_7`). Now given the `theta's` we can compute the orientation and position of the end effector.
 
+
+Note: In order to speed up the computation the DH params where substituted when available while computing `T0_EE`
+
+```python
+T0_EE = 
+⎡((sin(q₁)⋅sin(q₄) + sin(q₂ + q₃)⋅cos(q₁)⋅cos(q₄))⋅cos(q₅) + sin(q₅)⋅cos(q₁)⋅cos(q₂ + q₃))⋅cos(q₆) - (-sin(q₁)⋅cos(q₄) + sin(q₄)⋅sin(q₂ + q₃)⋅cos(q₁))⋅sin(q₆)  -((sin(q₁)⋅sin(q₄) + sin(q₂ + q₃)⋅cos(q₁)⋅cos(q₄))⋅cos(q₅) + sin(q₅)⋅cos(q₁)⋅cos(q₂ + q₃))⋅sin(q₆) + (sin(q₁)⋅
+⎢
+⎢((sin(q₁)⋅sin(q₂ + q₃)⋅cos(q₄) - sin(q₄)⋅cos(q₁))⋅cos(q₅) + sin(q₁)⋅sin(q₅)⋅cos(q₂ + q₃))⋅cos(q₆) - (sin(q₁)⋅sin(q₄)⋅sin(q₂ + q₃) + cos(q₁)⋅cos(q₄))⋅sin(q₆)   -((sin(q₁)⋅sin(q₂ + q₃)⋅cos(q₄) - sin(q₄)⋅cos(q₁))⋅cos(q₅) + sin(q₁)⋅sin(q₅)⋅cos(q₂ + q₃))⋅sin(q₆) - (sin(q₁)⋅
+⎢
+⎢                                -(sin(q₅)⋅sin(q₂ + q₃) - cos(q₄)⋅cos(q₅)⋅cos(q₂ + q₃))⋅cos(q₆) - sin(q₄)⋅sin(q₆)⋅cos(q₂ + q₃)                                                                  (sin(q₅)⋅sin(q₂ + q₃) - cos(q₄)⋅cos(q₅)⋅cos(q₂ + q₃))⋅sin(q₆) - sin(q₄)⋅cos(q₆
+⎢
+⎣                                                                              0                                                                                                                                                              0
+
+cos(q₄) - sin(q₄)⋅sin(q₂ + q₃)⋅cos(q₁))⋅cos(q₆)  -(sin(q₁)⋅sin(q₄) + sin(q₂ + q₃)⋅cos(q₁)⋅cos(q₄))⋅sin(q₅) + cos(q₁)⋅cos(q₅)⋅cos(q₂ + q₃)  -0.303⋅sin(q₁)⋅sin(q₄)⋅sin(q₅) + 1.25⋅sin(q₂)⋅cos(q₁) - 0.303⋅sin(q₅)⋅sin(q₂ + q₃)⋅cos(q₁)⋅cos(q₄) - 0.054⋅sin(q₂ + q₃)⋅cos(q₁) + 0
+
+sin(q₄)⋅sin(q₂ + q₃) + cos(q₁)⋅cos(q₄))⋅cos(q₆)  -(sin(q₁)⋅sin(q₂ + q₃)⋅cos(q₄) - sin(q₄)⋅cos(q₁))⋅sin(q₅) + sin(q₁)⋅cos(q₅)⋅cos(q₂ + q₃)  1.25⋅sin(q₁)⋅sin(q₂) - 0.303⋅sin(q₁)⋅sin(q₅)⋅sin(q₂ + q₃)⋅cos(q₄) - 0.054⋅sin(q₁)⋅sin(q₂ + q₃) + 0.303⋅sin(q₁)⋅cos(q₅)⋅cos(q₂ + q₃)
+
+)⋅cos(q₂ + q₃)                                                     -sin(q₅)⋅cos(q₄)⋅cos(q₂ + q₃) - sin(q₂ + q₃)⋅cos(q₅)                                                            -0.303⋅sin(q₅)⋅cos(q₄)⋅cos(q₂ + q₃) - 0.303⋅sin(q₂ + q₃)⋅cos(q₅) - 1.5⋅sin(q₂ + q₃) + 1.25⋅
+
+                                                                                            0                                                                                                                                                    1
+
+.303⋅cos(q₁)⋅cos(q₅)⋅cos(q₂ + q₃) + 1.5⋅cos(q₁)⋅cos(q₂ + q₃) + 0.35⋅cos(q₁)⎤
+                                                                           ⎥
+ + 1.5⋅sin(q₁)⋅cos(q₂ + q₃) + 0.35⋅sin(q₁) + 0.303⋅sin(q₄)⋅sin(q₅)⋅cos(q₁) ⎥
+                                                                           ⎥
+cos(q₂) - 0.054⋅cos(q₂ + q₃) + 0.75                                        ⎥
+                                                                           ⎥
+                                                                           ⎦
+
+```
+
 ### Inverse kinematics
 
 In this section we how to compute the values of `theta` given the expected position of the end effector, in other words we are revese engineering the forward kinemtics transition matrices to get the control values, which in our case are `theta 1 to 6`. In this project MoveIt describes the path / trajectory of the point and we need to compute the thetas such then end effector follows that trajectory.
@@ -81,6 +134,9 @@ theta2 = atan2(sqrt(1. - D*D), D) + atan2((Wc[2]-JZ0_2), sqrt((Wc[0]-JX0_2)**2 +
 theta2 = np.pi / 2. - theta2
 
 ```
+
+![Theta 2 Derivation](https://github.com/argmin/rarm/blob/master/theta2.jpg)
+
 #### Theta 3
 We first need to find the angle between line from joint 3-5 and line from extending from joint 2 - 3, and make adjustment for the offset for joint 4 in Z direction and the knee bend.
 
@@ -90,6 +146,8 @@ D = 1. if (D > 1 or D < -1) else D # Precaution agains imaginary numbers
 theta3 = atan2(0.054, 1.5) - np.pi/2. + acos(D)
 
 ``` 
+
+![Theta 3 Derivation](https://github.com/argmin/rarm/blob/master/theta3.jpg)
 
 #### Theta 4-6
 To compute theta4-6 we need to first find the orientation matrix from `R3_6`, when theta1-3 are applied to the transition matrix `T0_3`
